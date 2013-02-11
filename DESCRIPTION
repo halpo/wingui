@@ -1,0 +1,9 @@
+Package: wintitle
+Type: Package
+Title: Allows setting the windows Rgui Title.
+Version: 1.0
+Date: 2013-02-11
+Author: Andrew Redd <amredd@gmail.com>
+Maintainer: Andrew Redd <amredd@gmail.com>
+Description: It sets the Windows Rgui title to something other than RConsole.
+License: MIT

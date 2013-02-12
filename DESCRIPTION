@@ -7,3 +7,10 @@ Author: Andrew Redd <amredd@gmail.com>
 Maintainer: Andrew Redd <amredd@gmail.com>
 Description: It sets the Windows Rgui title to something other than RConsole.
 License: MIT
+RcppModules: wintitle
+Depends:
+    methods,
+    Rcpp
+LinkingTo: Rcpp
+Collate:
+    'set_win_title.R'

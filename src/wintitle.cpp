@@ -10,10 +10,13 @@
 #include <stdexcept>
 using namespace std;
 
+#include "wingui.h"
+
+
 class findR{
   private:
     DWORD _Rpid;
-    HWND _RWnd;
+    HWND  _RWnd;
   public:
     findR(DWORD pid):_Rpid(pid),_RWnd(NULL){}
     bool isR( HWND in) {
@@ -32,11 +35,6 @@ class findR{
         return _RWnd;
     }
 };
-
-
-int get_pid() {
-    return GetCurrentProcessId();
-}
 BOOL CALLBACK EnumFind(HWND aWnd, LPARAM lParam) {
 	findR* find = (findR *)lParam;
 	if (!IsWindowVisible(aWnd)){ // Skip hidden windows.
@@ -45,33 +43,29 @@ BOOL CALLBACK EnumFind(HWND aWnd, LPARAM lParam) {
     }
 	return !(find->isR(aWnd));
 }
-HWND getWin() {
+
+int WindowsGUI::get_pid() {
+    return GetCurrentProcessId();
+}
+WindowsGUI::WindowsGUI() {
     findR find(get_pid());
     EnumWindows(EnumFind, (LPARAM)&find);
-    return find.RWnd();
+    HGUI = find.RWnd();
 }
-string get_win() {
+string WindowsGUI::get_win() {
     ostringstream stringStream;
-    stringStream << getWin() << endl;
+    stringStream << HGUI;
     return stringStream.str();
 }
-string getWindowTextI(HWND Wnd=NULL) {
+string WindowsGUI::get_window_text() {
     const int nMaxCount = 255;
     char szBuffer[nMaxCount+1];
-    if(!Wnd)
-        Wnd = getWin();
-    if(!Wnd)
-        throw runtime_error("could not find R!");
-    GetWindowText( getWin(), szBuffer, nMaxCount );
+    GetWindowText( HGUI, szBuffer, nMaxCount );
     string title = szBuffer;
     return title;
 }
-string get_window_text() {
-    return getWindowTextI();
+void WindowsGUI::set_window_text(string title) {
+    SetWindowText(HGUI, title.c_str());
+    return;
 }
-string set_window_text(string title) {
-    SetWindowText(getWin(), title.c_str());
-    return get_window_text();
-}
-
 

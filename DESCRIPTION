@@ -1,7 +1,7 @@
-Package: wintitle
+Package: wingui
 Type: Package
 Title: Allows setting the windows Rgui Title.
-Version: 1.0
+Version: 0.1
 Date: 2013-02-11
 Author: Andrew Redd <amredd@gmail.com>
 Maintainer: Andrew Redd <amredd@gmail.com>
@@ -14,5 +14,4 @@ Depends:
     Rcpp
 LinkingTo: Rcpp
 Collate:
-    'wintitle.R'
-    'set_win_title.R'
+    'wingui.R'

@@ -2,18 +2,17 @@
 #include <Rcpp.h>
 #include <string>
 
+#include "wingui.h"
+
 using namespace Rcpp;
 using namespace std;
 
-int get_pid();
-string get_window_text();
-string set_window_text(string);
-
-
-
-RCPP_MODULE(wintitle){
-    function("get_pid", &get_pid);
-    function("get_window_text", &get_window_text);
-    function("set_window_text", &set_window_text);
+RCPP_MODULE(wingui){
+    class_<WindowsGUI>( "WindowsGUI" )
+        .constructor()
+        .property(".pid" , &WindowsGUI::get_pid)
+        .property(".hwnd", &WindowsGUI::get_win)
+        .property("Title", &WindowsGUI::get_window_text, &WindowsGUI::set_window_text, "Title of the window")
+        ;
 }
 

@@ -8,10 +8,10 @@ Maintainer: Andrew Redd <amredd@gmail.com>
 Description: It sets the Windows Rgui title to something other than RConsole.
 License: MIT
 RcppModules: wintitle
-Imports:
-    methods
 Depends:
+    methods,
     Rcpp
 LinkingTo: Rcpp
 Collate:
     'wingui.R'
+    'wintitle.R'

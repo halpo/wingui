@@ -10,13 +10,23 @@ NULL
 if(!exists(".packageName", inherit=F))
     .packageName <- 'wingui'
 
-.onLoad <- function(libname, pkgname){
-    loadModule('wingui', T)
-    GUI <<- WindowsGUI$new()
+myLoad <- function(ns){
+    if(interactive()){
+        env <- topenv(parent.frame())
+        if(!Rcpp:::moduleIsLoaded('wingui', env))
+            loadModule('wingui', TRUE, TRUE, env)
+        setRcppClass("WindowsGUI", module='wingui', saveAs="WindowsGUI", where=env
+                    , methods=list(show=function(x){
+                        cat("Windows GUI")  
+                    }))
+        GUI <<- new("WindowsGUI")
+    } else {
+        warning("wingui is only helpfull in interactive windows situations.")
+    }
 }
-    
+setLoadAction(myLoad)
 
-# setRcppClass("WindowsGUI", module='wingui', saveAs="WindowsGUI")
+
 
 #' @title Windows Rgui accessor class
 #' 

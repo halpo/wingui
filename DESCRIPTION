@@ -14,4 +14,3 @@ Depends:
 LinkingTo: Rcpp
 Collate:
     'wingui.R'
-    'wintitle.R'

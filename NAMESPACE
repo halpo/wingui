@@ -1,0 +1,4 @@
+export(GUI)
+import(Rcpp)
+import(methods)
+useDynLib(wingui)

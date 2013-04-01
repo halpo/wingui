@@ -1,3 +1,13 @@
+{###############################################################################
+#  wingui.R
+#  2013 Andrew Redd
+#  
+#  This file is released under the terms of the MIT license.
+#  Please See http://www.r-project.org/Licenses/MIT
+}###############################################################################
+
+
+
 #' @name wingui
 #' @docType package
 #' @title Manipulate the Windows Rgui.
@@ -42,8 +52,8 @@ setLoadAction(myLoad)
 #' \dontrun{
 #' GUI$Title
 #' GUI$Title <- "My Title"
-#' 
 #' }
+#' 
 #' @export
 GUI <- NULL
 # setHook( packageEvent('wingui'), function(libname, pkgname){

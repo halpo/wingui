@@ -1,11 +1,12 @@
 Package: wingui
 Type: Package
-Title: Allows setting the windows Rgui Title.
+Title: Modify advanced Windows Rgui attributes.
 Version: 0.1
-Date: 2013-02-11
+Date: 2013-04-01
 Author: Andrew Redd <amredd@gmail.com>
 Maintainer: Andrew Redd <amredd@gmail.com>
-Description: It sets the Windows Rgui title to something other than RConsole.
+Description: Modify advanced Windows Rgui attributes. Currently only the title
+    is supported.
 License: MIT
 RcppModules: wintitle
 OStype: windows

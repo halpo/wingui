@@ -9,7 +9,7 @@ Description: Modify advanced Windows Rgui attributes. Currently only the title
     is supported.
 License: MIT
 RcppModules: wintitle
-OStype: windows
+OS_Type: windows
 Depends:
     R (>= 2.15.0),
     methods,

@@ -7,7 +7,7 @@ Author: Andrew Redd <amredd@gmail.com>
 Maintainer: Andrew Redd <amredd@gmail.com>
 Description: Modify advanced Windows Rgui attributes. Currently only the title
     is supported.
-License: MIT
+License: MIT|GPL-2|GPL-3
 RcppModules: wintitle
 OS_Type: windows
 Depends:
@@ -15,5 +15,4 @@ Depends:
     methods,
     Rcpp
 LinkingTo: Rcpp
-Collate:
-    'wingui.R'
+Roxygen: list(wrap = FALSE)

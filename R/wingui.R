@@ -20,11 +20,11 @@ NULL
 if(!exists(".packageName", inherit=F))
     .packageName <- 'wingui'
 
-setRcppClass("WindowsGUI", module='wingui', saveAs="WindowsGUI"
-, methods=list(show=function(x){
-    cat("Windows GUI")  
-}))
-
+if(.Platform$OS.type=="windows"){
+    setRcppClass("WindowsGUI", module='wingui', saveAs="WindowsGUI"
+    , methods=list(show=function(x){
+        cat("Windows GUI")  
+    }))
                     
 myLoad <- function(ns){
     if(interactive()){
@@ -34,6 +34,7 @@ myLoad <- function(ns){
     }
 }
 setLoadAction(myLoad)
+}
 
 
 
@@ -56,10 +57,6 @@ setLoadAction(myLoad)
 #' 
 #' @export
 GUI <- NULL
-# setHook( packageEvent('wingui'), function(libname, pkgname){
-    # print(pkgname)
-    # assign("GUI", WindowsGUI$new(), envir=asNamespace(pkgname))
-# }) 
 
 
 

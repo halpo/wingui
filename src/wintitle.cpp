@@ -1,10 +1,11 @@
 
+#ifdef _WIN32
+
 #include <Rcpp.h>
 
 #undef Realloc
 #undef Free
 
-#include <windows.h>
 #include <string>
 #include <sstream>
 #include <stdexcept>
@@ -69,3 +70,4 @@ void WindowsGUI::set_window_text(string title) {
     return;
 }
 
+#endif

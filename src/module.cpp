@@ -1,4 +1,6 @@
 
+#ifdef _WIN32
+
 #include <Rcpp.h>
 #include <string>
 
@@ -16,3 +18,4 @@ RCPP_MODULE(wingui){
         ;
 }
 
+#endif

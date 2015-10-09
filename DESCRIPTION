@@ -1,6 +1,6 @@
 Package: wingui
 Type: Package
-Title: Modify advanced Windows Rgui attributes.
+Title: Advanced Windows Functions
 Version: 0.1
 Date: 2013-04-01
 Author: Andrew Redd <amredd@gmail.com>
@@ -14,5 +14,9 @@ Depends:
     R (>= 2.15.0),
     methods,
     Rcpp
+Suggests:
+    plyr,
+    lubridate,
+    stringr
 LinkingTo: Rcpp
 Roxygen: list(wrap = FALSE)

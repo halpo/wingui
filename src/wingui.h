@@ -1,4 +1,5 @@
 
+#include <windows.h>
 
 #ifndef _WINDEF_
 typedef void * HWND;

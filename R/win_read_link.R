@@ -215,6 +215,14 @@ parseCommonNetworkRelativeLink <- function(cn){
     structure(as.list(environment()))
 }
 
+#' Read a windows '.lnk' file.
+#' 
+#' @param filename file to read.
+#' @param ... discarded
+#' 
+#' @return file path to where the file points, most often specified relatively, along with
+#' 		attribute data which contains the information used to parse the lnk file.
+#' 
 #' @export
 read_lnk <- function(filename, ...){
     if(!file.exists(filename) && file.exists(.f <- paste0(filename, ".lnk")))

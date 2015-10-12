@@ -3,7 +3,7 @@
 #endif
 #ifdef Free
 #undef Free
-#endif Free
+#endif
 
 #include <windows.h>
 

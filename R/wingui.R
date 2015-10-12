@@ -45,6 +45,10 @@ setLoadAction(myLoad)
 #' The is a \link[methods:ReferenceClasses]{reference class} building off the 
 #' windows API.
 #' 
+#' @format An instance of WindowsGUI reference class.
+#' 
+#' 
+#' 
 #' Available attributes are available through attributes of \code{GUI}
 #' \enumerate{
 #'    \item \code{$Title} The title of the window.

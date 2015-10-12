@@ -22,8 +22,8 @@ if(!exists(".packageName", inherit=F))
 
 if(.Platform$OS.type=="windows" && .Platform$GUI=="Rgui"){
     setRcppClass("WindowsGUI", module='wingui', saveAs="WindowsGUI"
-    , methods=list(show=function(x){
-        cat("Windows GUI")  
+    , methods=list(show=function(){
+        cat("Windows GUI (", .hwnd, ")\n")  
     }))
     myLoad <- function(ns){
         if(interactive()){

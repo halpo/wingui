@@ -66,5 +66,23 @@ void WindowsGUI::set_window_text(string title) {
     SetWindowText(HGUI, title.c_str());
     return;
 }
+bool WindowsGUI::get_on_top(){
+    return (GetWindowLong(HGUI, GWL_EXSTYLE) & WS_EX_TOPMOST) == WS_EX_TOPMOST;
+}
+void WindowsGUI::set_on_top(bool value){
+    if(value){
+        SetWindowPos( HGUI, HWND_TOPMOST
+                    , 0,0,0,0
+                    , SWP_NOREPOSITION | SWP_NOSIZE | SWP_NOMOVE
+                    );
+    } else {
+        SetWindowPos( HGUI, HWND_NOTOPMOST
+                    , 0,0,0,0
+                    , SWP_NOREPOSITION | SWP_NOSIZE | SWP_NOMOVE
+                    );
+    }
+    
+}
+
 
 #endif

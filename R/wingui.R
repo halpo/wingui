@@ -20,20 +20,19 @@ NULL
 if(!exists(".packageName", inherit=F))
     .packageName <- 'wingui'
 
-if(.Platform$OS.type=="windows"){
+if(.Platform$OS.type=="windows" && .Platform$GUI=="Rgui"){
     setRcppClass("WindowsGUI", module='wingui', saveAs="WindowsGUI"
     , methods=list(show=function(x){
         cat("Windows GUI")  
     }))
-                    
-myLoad <- function(ns){
-    if(interactive()){
-        GUI <<- new("WindowsGUI")
-    } else {
-        packageStartupMessage("wingui is only helpfull in interactive windows situations.")
+    myLoad <- function(ns){
+        if(interactive()){
+            GUI <<- new("WindowsGUI")
+        } else {
+            packageStartupMessage("wingui is only helpfull in interactive windows situations.")
+        }
     }
-}
-setLoadAction(myLoad)
+    setLoadAction(myLoad)
 }
 
 
@@ -47,11 +46,13 @@ setLoadAction(myLoad)
 #' 
 #' @format An instance of WindowsGUI reference class.
 #' 
-#' 
-#' 
+#' @Description
+#' This object is defined if using the Rgui interface on windows.
 #' Available attributes are available through attributes of \code{GUI}
 #' \enumerate{
 #'    \item \code{$Title} The title of the window.
+#'    \item \code{$.pid} The process ID.
+#'    \item \code{$.hwnd} The window handle.
 #' }
 #' @examples
 #' \dontrun{

@@ -2,6 +2,8 @@
 
 S3method(print,WindowsLinkInfo)
 export(GUI)
+export(explorer)
+export(file_manager)
 export(read_lnk)
 import(Rcpp)
 import(methods)

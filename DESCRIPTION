@@ -7,7 +7,7 @@ Author: Andrew Redd <amredd@gmail.com>
 Maintainer: Andrew Redd <amredd@gmail.com>
 Description: Modify advanced Windows Rgui attributes. Currently only the title
     is supported.
-License: MIT|GPL-2|GPL-3
+License: GPL-2|GPL-3|MIT + file LICENSE
 RcppModules: wintitle
 OS_Type: windows
 Depends:

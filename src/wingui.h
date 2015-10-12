@@ -1,3 +1,9 @@
+#ifdef Realloc
+#undef Realloc
+#endif
+#ifdef Free
+#undef Free
+#endif Free
 
 #include <windows.h>
 

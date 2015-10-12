@@ -3,9 +3,6 @@
 
 #include <Rcpp.h>
 
-#undef Realloc
-#undef Free
-
 #include <string>
 #include <sstream>
 #include <stdexcept>

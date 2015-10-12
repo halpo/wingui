@@ -29,7 +29,7 @@ if(.Platform$OS.type=="windows" && .Platform$GUI=="Rgui"){
         if(interactive()){
             GUI <<- new("WindowsGUI")
         } else {
-            packageStartupMessage("wingui is only helpfull in interactive windows situations.")
+            packageStartupMessage("wingui is most helpfull in interactive windows situations.")
         }
     }
     setLoadAction(myLoad)
@@ -51,6 +51,10 @@ if(.Platform$OS.type=="windows" && .Platform$GUI=="Rgui"){
 #' Available attributes are available through attributes of \code{GUI}
 #' \enumerate{
 #'    \item \code{$Title} The title of the window.
+#'    \item \code{$opacity} Percentage of the opacity of the window.
+#'    \item \code{$transparency} Percentage of the transparency of the window, wrapper of opacity
+#'    \item \code{$on.top} bollean of if the window is fixed on top. 
+#'    \item \code{$layered} bollean of if the window is considered layered.
 #'    \item \code{$.pid} The process ID.
 #'    \item \code{$.hwnd} The window handle.
 #' }

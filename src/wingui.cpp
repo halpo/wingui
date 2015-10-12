@@ -84,5 +84,49 @@ void WindowsGUI::set_on_top(bool value){
     
 }
 
+bool WindowsGUI::get_layered(){
+    return GetWindowLong(HGUI, GWL_EXSTYLE) & WS_EX_LAYERED;
+}
+void WindowsGUI::set_layered(bool value){
+    LONG exstyle=GetWindowLong(HGUI, GWL_EXSTYLE);
+    if(value)
+        SetWindowLong(HGUI, GWL_EXSTYLE, exstyle | WS_EX_LAYERED);
+    else
+        SetWindowLong(HGUI, GWL_EXSTYLE, exstyle &~WS_EX_LAYERED);
+}
+
+
+double WindowsGUI::get_opacity(){
+    if(GetWindowLong(HGUI, GWL_EXSTYLE) & WS_EX_LAYERED){
+		COLORREF color;
+		BYTE alpha;
+		DWORD flags;
+        GetLayeredWindowAttributes(HGUI, &color, &alpha, &flags);
+        return alpha / 255.;
+    } else {
+        return 1;
+    }
+}
+void WindowsGUI::set_opacity(double percent){
+    if (percent < 0) percent = 0;
+    else {
+        LONG exstyle = GetWindowLong(HGUI, GWL_EXSTYLE);
+        if (percent >= 1) {
+            SetWindowLong(HGUI, GWL_EXSTYLE, exstyle & ~WS_EX_LAYERED);
+        } else {
+            SetWindowLong(HGUI, GWL_EXSTYLE, exstyle | WS_EX_LAYERED);
+            SetLayeredWindowAttributes(HGUI, 0, 255 * percent, LWA_ALPHA);
+        }
+    }
+}
+
+double WindowsGUI::get_transparency(){
+    return 1-get_opacity();
+}
+void WindowsGUI::set_transparency(double percent){
+    if(percent < 0) percent = 0;
+    if(percent > 1) percent = 1;
+    set_opacity(1-percent);
+}
 
 #endif

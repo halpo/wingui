@@ -1,7 +1,7 @@
 find_npp <- 
 function(){
     exe <- 
-    file.path( readRegistry("SOFTWARE\\Notepad++", "HLM", view="32-bit")[[1]]
+    file.path( utils::readRegistry("SOFTWARE\\Notepad++", "HLM", view="32-bit")[[1]]
              , "Notepad++.exe"
              )
     if(file.exists(exe)) return(normalizePath(exe))
@@ -26,6 +26,7 @@ function(){
 #' 
 #' @param ... passed on as arguments to npptor
 #' @param exe path to the NppToR exacutable
+#' @param startup should the '-startup' parameter be passed to npptor?
 #' 
 #' @export
 npptor <- 

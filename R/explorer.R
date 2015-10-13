@@ -27,6 +27,6 @@ function( dir     = getwd()                                         #< Directory
 }
 
 #' @export
-#' @describeIn file_manager
+#' @describeIn file_manager alias for \code{file_manager}
 explorer <- file_manager
 

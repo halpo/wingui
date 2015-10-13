@@ -5,17 +5,20 @@ Version: 0.2
 Date: 2015-10-12
 Author: Andrew Redd <amredd@gmail.com>
 Maintainer: Andrew Redd <amredd@gmail.com>
-Description: Helps for interfacing with the operating system 
+Description: Helps for interfacing with the operating system
     particularly for Windows.
 License: GPL-2|GPL-3|MIT + file LICENSE
-RcppModules: wintitle
+RcppModules: wingui
 Depends:
     R (>= 2.15.0),
     methods,
     Rcpp
+Imports:
+    utils
 Suggests:
     plyr,
     lubridate,
     stringr
 LinkingTo: Rcpp
 Roxygen: list(wrap = FALSE)
+RoxygenNote: 4.1.1.9001

@@ -20,16 +20,19 @@ NULL
 if(!exists(".packageName", inherit=F))
     .packageName <- 'wingui'
 
-if(.Platform$OS.type=="windows" && .Platform$GUI=="Rgui"){
-    setRcppClass("WindowsGUI", module='wingui', saveAs="WindowsGUI"
-    , methods=list(show=function(){
-        cat("Windows GUI (", .hwnd, ")\n")  
-    }))
+if(.Platform$OS.type=="windows"){
+    setRcppClass( "WindowsGUI"
+                , module='wingui'
+#~                 , saveAs="WindowsGUI"
+                , methods=list(show=function(){
+                        cat("Windows GUI (", .hwnd, ")\n")  
+                    })
+                )
     myLoad <- function(ns){
-        if(interactive()){
+        if(interactive() && .Platform$GUI=="Rgui"){
             GUI <<- new("WindowsGUI")
         } else {
-            packageStartupMessage("wingui is most helpfull in interactive windows situations.")
+            packageStartupMessage("wingui is most helpfull in Rgui on windows.")
         }
     }
     setLoadAction(myLoad)
@@ -46,7 +49,7 @@ if(.Platform$OS.type=="windows" && .Platform$GUI=="Rgui"){
 #' 
 #' @format An instance of WindowsGUI reference class.
 #' 
-#' @Description
+#' @description
 #' This object is defined if using the Rgui interface on windows.
 #' Available attributes are available through attributes of \code{GUI}
 #' \enumerate{
@@ -62,6 +65,9 @@ if(.Platform$OS.type=="windows" && .Platform$GUI=="Rgui"){
 #' \dontrun{
 #' GUI$Title
 #' GUI$Title <- "My Title"
+#' GUI$opacity <- 0.90      # set to 90%
+#' GUI$transparency         # should now be 0.10
+#' GUI$on.top <- T          # Rgui will now always be on top
 #' }
 #' 
 #' @export

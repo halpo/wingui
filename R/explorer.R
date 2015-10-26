@@ -22,7 +22,10 @@ function( dir     = getwd()                                         #< Directory
         ){
     "Open the file manager."
     dir <- normalizePath(dir)
-    suppressWarnings(system2(manager, dir, wait=FALSE, invisible=FALSE))
+    if(.Platform$OS.type=="windows")
+        suppressWarnings(system2(manager, shQuote(dir), wait=FALSE, invisible=FALSE))
+    else 
+        suppressWarnings(system2(manager, shQuote(dir), wait=FALSE))
     #! @return called for the side effect.
 }
 

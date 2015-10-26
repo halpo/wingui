@@ -12,6 +12,7 @@
 #' @docType package
 #' @title Manipulate the Windows Rgui.
 #' 
+#' @importFrom utils head tail read.csv
 #' @import Rcpp
 #' @import methods
 #' @useDynLib wingui

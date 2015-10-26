@@ -21,26 +21,40 @@ function(){
     if(file.exists(exe)) return(normalizePath(exe))
     return(invisible(NULL))
 }
+is_npptor_running <- 
+function(){
+    win_process_running("NppToR")
+}
+
+
 
 #' Launch NppToR
 #' 
 #' @param ... passed on as arguments to npptor
 #' @param exe path to the NppToR exacutable
-#' @param startup should the '-startup' parameter be passed to npptor?
+#' @param startup   should the '-startup' parameter be passed to npptor?
+#' @param overwrite if TRUE do not attempt to start if NppToR is running.
 #' 
 #' @export
 npptor <- 
-function( ...
-        , exe = getOption("wingui::npptor", find_npptor())
-        , startup = getOption("wingui::startup", is_r_startup())
+function( ...           
+        , exe       = getOption("wingui::npptor::exe", find_npptor())
+        , startup   = getOption("wingui::npptor::startup", is_r_startup())
+        , overwrite = getOption("wingui::npptor::overwrite", !startup)
         ){
-    c( "-rhome", R.home()
-     , "-npp", getOption("wingui::Notepad++", find_npp())
-     , if(startup) "-startup"
-     )
+    npp.loc <- getOption("wingui::Notepad++", find_npp())
+    args <- 
+        c( "-rhome", R.home()
+         , if(!is.null(npp.loc)) c("-npp", npp.loc)
+         , if(startup) "-startup"
+         , ... 
+         )
 
-    if(!is.null(exe))
-        system2(exe, list(...), wait=F, invisible=F)
+    if(is.null(exe))
+        stop( "NppToR exe could not be found, "
+            , "please specify location in the 'wingui::npptor' option.")
+    if(!overwrite && is_npptor_running()) return(invisible(NULL))
+    system2(exe, list(...), wait=FALSE, invisible=FALSE)
 }
 
 #' Launch Notepad++

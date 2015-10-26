@@ -1,6 +1,17 @@
 wingui NEWS
 ===========
 
+Version 0.3
+-----------
+* Added `is_npptor_running`
+* Added `win_process_running`
+* Added `overwrite` option to `npptor`
+* Updated exports to include:
+    + `win_processes`
+    + `win_users`
+    + `win_kill`
+    + `whos_the_hog`
+
 Version 0.2
 -----------
 * Added opacity/transparency to WindowsGUI

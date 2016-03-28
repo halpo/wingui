@@ -3,6 +3,7 @@ wingui NEWS
 
 Version 0.3
 -----------
+* Added `spawnR`, and `BATCH`
 * Added `is_npptor_running`
 * Added `win_process_running`
 * Added `overwrite` option to `npptor`

@@ -3,6 +3,7 @@ wingui NEWS
 
 Version 0.3
 -----------
+* Added `win_memory` and `win_load`
 * Added `spawnR`, and `BATCH`
 * Added `is_npptor_running`
 * Added `win_process_running`

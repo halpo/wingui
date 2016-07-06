@@ -5,16 +5,16 @@ Session.Name <-
 NULL
 
 
+#' @export
+#' @importFrom lubridate dhours dminutes dseconds
 win_processes <- 
 function(){
     "list machine processes"
-    stopifnot(requireNamespace("lubridate"))
     output <- system2("tasklist", c("/v", "/fo csv"), stdout=T)
     file <- textConnection(output)
     on.exit(close(file))
     wp <- utils::read.csv( file, na.strings="N/A")
     names(wp) <- gsub("\\.$", "", names(wp))
-    Session.Name
     transform( wp
              , Mem.Usage = as.numeric(gsub(" K", "", gsub(",", "", wp$Mem.Usage)))
              , CPU.Time  = lubridate::dhours(  as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\1", CPU.Time)))
@@ -22,12 +22,17 @@ function(){
                          + lubridate::dseconds(as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\3", CPU.Time)))
              , Session.Name = tolower(Session.Name)
              )
+    #! @return a <data.frame> with Image name, PID, Session info, 
+    #^ Memory and CPU usage, and user name.
 }
+
+#' @export
+#' @importFrom stringr str_sub str_split
 win_users <-
 function(){
-    "List logged on users"
+    #! List logged on users
     stopifnot(requireNamespace("stringr"))
-    output <- system("query user", intern=TRUE)
+    output <- suppressWarnings(system2("query", "user", stdout=TRUE))
     output <- stringr::str_sub(output, 2)
     
     x <- stringr::str_split(output, "  +")
@@ -37,6 +42,7 @@ function(){
     z <- as.data.frame(y)
     z[["LOGON TIME"]] <- as.POSIXct(z[["LOGON TIME"]], format="%m/%d/%Y %I:%M %p")
     return(z)
+    #! @return a <data.frame> with user and session information.
 }
 if(FALSE){ #testing
     library(plyr)
@@ -52,20 +58,33 @@ if(FALSE){ #testing
          )
 }
 
+#' @export
 win_load <- function(){
     "list the load on the CPU."
-    output <- system2("wmic", c("cpu", "get", "loadpercentage", "/format:csv"), stdout=TRUE)
-    read.csv(textConnection(output)) [[2]]
+    output <- system2("wmic", c("cpu", "get", "loadpercentage,CurrentClockSpeed,MaxClockSpeed,Name", "/format:csv"), stdout=TRUE)
+    transform( read.csv(textConnection(output))
+             , LoadPercentage=LoadPercentage/100
+             )[,c('Node', 'Name', 'LoadPercentage', 'CurrentClockSpeed', 'MaxClockSpeed')]
+    #! @Return A <data.frame> with Node, Processor Name, 
+    #^ Current load percent (0-1), Current clock speed (Mhz), 
+    #^ and Max Clock Speed (Mhz)
 }
 
+#' @export
 win_kill <- 
-function( ...       	#< Thrown Away, used to force user to specify full argument name.
+function( ...       	#< Thrown Away, used to force user to specify 
+                        #^ full argument name.
         , image     	#< The executable name, such as 'Rgui.exe'
-	, pid       	#< process ID, a number
-	, force=TRUE	#< force close?
-	, title=NULL	#< Filter by title
-	){
-    "Kill processes"
+	    , pid       	#< process ID, a number
+	    , force=TRUE	#< force close?
+	    , title=NULL	#< Filter by title
+	    ){
+    #! Kill processes
+    #! 
+    #! Use this function to kill individual or family processes on a machine.
+    #! User must have the permission to kill the process.
+    #! 
+    #TODO Add reference for taskkill from MSDN.
     if(!missing(image))
         for(i in image)
             system2("taskkill", c(if(force)"/F", "/IM", i))

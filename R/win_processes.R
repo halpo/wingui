@@ -54,7 +54,8 @@ if(FALSE){ #testing
 
 win_load <- function(){
     "list the load on the CPU."
-    system2("wmic", c("cpu", "get", "loadpercentage"))
+    output <- system2("wmic", c("cpu", "get", "loadpercentage", "/format:csv"), stdout=TRUE)
+    read.csv(textConnection(output)) [[2]]
 }
 
 win_kill <- 
@@ -75,21 +76,3 @@ function( ...       	#< Thrown Away, used to force user to specify full argument
         system2("taskkill", c(if(force)"/F", "/FI", shQuote(paste0("Windowtitle eq ", title))))
 }
 
-# @Suggests plyr
-# @Suggests lubridate
-whos_the_hog <- function(){
-    "Lists the resource useage summarized by user."
-    stopifnot(requireNamespace("plyr"), requireNamespace("lubridate"))
-    wp <- win_processes()
-    users <- win_users()
-    names(users) <- c("Username", "Session.Name", "Session.ID", "State", "Idle.Time", "Logon.Time")
-    joined <- merge( wp[setdiff(names(wp), "User.Name")]
-                   , users, by="Session.Name")
-    
-    plyr::arrange(
-	plyr::ddply( joined, plyr::as.quoted("Username"), plyr::summarize
-                   , Mem.Usage = sum(Mem.Usage)
-                   , N.Processes = NROW(Mem.Usage)
-                   , CPU.Time = sum(CPU.Time)
-                   ), Mem.Usage, CPU.Time)
-}

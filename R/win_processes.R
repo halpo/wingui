@@ -4,13 +4,18 @@ CPU.Time <-
 Session.Name <-
 NULL
 
-
+#' List machine processes
+#' 
+#' @param verbose Verbose output.
+#' 
+#' @return a data.frame with process information
 #' @export
 #' @importFrom lubridate dhours dminutes dseconds
 win_processes <- 
-function(){
-    "list machine processes"
-    output <- system2("tasklist", c("/v", "/fo csv"), stdout=T)
+function( verbose = TRUE  #< Verbose output.
+        ){
+    "List machine processes"
+    output <- system2("tasklist", c(if(verbose)"/v", "/fo csv"), stdout=T)
     file <- textConnection(output)
     on.exit(close(file))
     wp <- utils::read.csv( file, na.strings="N/A")
@@ -22,15 +27,41 @@ function(){
                          + lubridate::dseconds(as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\3", CPU.Time)))
              , Session.Name = tolower(Session.Name)
              )
-    #! @return a <data.frame> with Image name, PID, Session info, 
-    #^ Memory and CPU usage, and user name.
 }
 
+#' Check for a running process.
+#' 
+#' @param name     Program name, Process ID, or Session Name.
+#' @param server   server to check on, if `NULL` defaults to local host.
+#' @param session  session to filter for.
+#' 
+#' @return A logical indicating if there exists a process running.
 #' @export
-#' @importFrom stringr str_sub str_split
+win_process_running <- 
+function( name	    	#< Program name, Process ID, or Session Name.
+	, server=NULL  	#< server to check on, if `NULL` defaults to local host.
+	, session=NULL  #< session to filter for.
+	){
+    #' Check for a running process.
+    output <- 
+	system2( "QUERY"
+	       , c("PROCESS", name)
+	       , stdout=TRUE)
+    if(any(grepl("No Process exits", output))) return(FALSE)
+    output <- gsub("^[ >]", '', output)
+    file <- textConnection(output)
+    on.eqxit(close(file))
+    info <- utils::read.csv( file, na.strings="N/A")
+    return(structure(TRUE, info=info))
+    #' A logical indicating if there exists a process running.
+}
+
+#' List logged on users
+#' 
+#' @return data.frame of user information
+#' @export
 win_users <-
 function(){
-    #! List logged on users
     stopifnot(requireNamespace("stringr"))
     output <- suppressWarnings(system2("query", "user", stdout=TRUE))
     output <- stringr::str_sub(output, 2)
@@ -42,7 +73,6 @@ function(){
     z <- as.data.frame(y)
     z[["LOGON TIME"]] <- as.POSIXct(z[["LOGON TIME"]], format="%m/%d/%Y %I:%M %p")
     return(z)
-    #! @return a <data.frame> with user and session information.
 }
 if(FALSE){ #testing
     library(plyr)
@@ -58,6 +88,7 @@ if(FALSE){ #testing
          )
 }
 
+#' list the load on the CPU.
 #' @export
 win_load <- function(){
     "list the load on the CPU."
@@ -70,6 +101,15 @@ win_load <- function(){
     #^ and Max Clock Speed (Mhz)
 }
 
+#' Kill Processes
+#' 
+#' @param ...    Thrown Away, used to force user to specify full argument name.
+#' @param image  The executable name, such as 'Rgui.exe'
+#' @param pid    process ID, a number
+#' @param force  force close?
+#' @param title  Filter by title
+#' 
+#' 
 #' @export
 win_kill <- 
 function( ...       	#< Thrown Away, used to force user to specify 

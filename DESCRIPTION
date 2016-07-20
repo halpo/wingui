@@ -1,22 +1,24 @@
 Package: wingui
 Type: Package
 Title: Advanced Windows Functions
-Version: 0.1
-Date: 2013-04-01
+Version: 0.2
+Date: 2015-10-12
 Author: Andrew Redd <amredd@gmail.com>
 Maintainer: Andrew Redd <amredd@gmail.com>
-Description: Modify advanced Windows Rgui attributes. Currently only the title
-    is supported.
+Description: Helps for interfacing with the operating system
+    particularly for Windows.
 License: GPL-2|GPL-3|MIT + file LICENSE
-RcppModules: wintitle
-OS_Type: windows
+RcppModules: wingui
 Depends:
     R (>= 2.15.0),
     methods,
     Rcpp
+Imports:
+    utils
 Suggests:
     plyr,
     lubridate,
     stringr
 LinkingTo: Rcpp
 Roxygen: list(wrap = FALSE)
+RoxygenNote: 4.1.1.9001

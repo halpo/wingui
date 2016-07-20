@@ -1,3 +1,12 @@
+
+#' Spawn an additional R gui
+#' 
+#' @param wd Working directory
+#' @param restore Restore session?
+#' @param save Save on exit?
+#' @param vanilla pass --vanilla flag see \link{Startup}
+#' 
+#' @return Called for side effect.
 #' @export
 spawnR <- 
 function( wd      = getwd() #< [character] Working directory
@@ -24,13 +33,17 @@ function( wd      = getwd() #< [character] Working directory
 	       , wait=FALSE, stdout=FALSE, stderr=FALSE, invisible=FALSE)
 }
 
-#` @export
+
+#' Run a file in a separate Batch mode.
+#'
+#' @param file the file to run.
+#'
+#' @return Called for the side effect of creating a separate process.
+#' @export
 BATCH <- function(file){
-    #! Run a file in Batch mode.
 	system2( list.file(R.home("bin"), "Rcmd", full.names=TRUE)
 	       , sprintf("BATCH %s", shQuote(file))
 		   , wait=FALSE, invisible=TRUE)
-    #< Called for the side effect of creating a separate process.
 }
 
 in_dir <- function(dir, code){

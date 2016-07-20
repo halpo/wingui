@@ -52,3 +52,25 @@ win_load <- function(){
     read.csv(textConnection(output))[[2]]    
     #< An integer (0-100) representing the percent load on the machine.
 }
+
+#' Lists the resource useage summarized by user.
+#' 
+#' @Suggests plyr
+#' @Suggests lubridate
+#' @export
+whos_the_hog <- function(){
+    "Lists the resource useage summarized by user."
+    stopifnot(requireNamespace("plyr"), requireNamespace("lubridate"))
+    wp <- win_processes(verbose=TRUE)
+    users <- win_users()
+    names(users) <- c("Username", "Session.Name", "Session.ID", "State", "Idle.Time", "Logon.Time")
+    joined <- merge( wp[setdiff(names(wp), "User.Name")]
+                   , users, by="Session.Name")
+    
+    plyr::arrange(
+	plyr::ddply( joined, plyr::as.quoted("Username"), plyr::summarize
+                   , Mem.Usage = sum(Mem.Usage)
+                   , N.Processes = NROW(Mem.Usage)
+                   , CPU.Time = sum(CPU.Time)
+                   ), Mem.Usage, CPU.Time)
+}

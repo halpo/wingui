@@ -23,9 +23,10 @@ function( verbose = TRUE  #< Verbose output.
     wp <- utils::read.csv( file, na.strings="N/A")
     names(wp) <- gsub("\\.$", "", names(wp))
     wp$Mem.Usage = as.numeric(gsub(" K", "", gsub(",", "", wp$Mem.Usage)))
-    wp$CPU.Time  = lubridate::dhours  (as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\1", wp$CPU.Time)))
+    wp$CPU.Time  =(lubridate::dhours  (as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\1", wp$CPU.Time)))
                  + lubridate::dminutes(as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\2", wp$CPU.Time)))
                  + lubridate::dseconds(as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\3", wp$CPU.Time)))
+                 )
     wp$Session.Name = tolower(wp$Session.Name)
     wp
 }

@@ -66,20 +66,23 @@ win_load <- function(){
 
 #' Lists the resource useage summarized by user.
 #' 
+#' @importFrom dplyr arrange_ summarize group_by_
 #' @export
 whos_the_hog <- function(){
     "Lists the resource useage summarized by user."
-    stopifnot(requireNamespace("plyr"), requireNamespace("lubridate"))
+    stopifnot(requireNamespace("dplyr"), requireNamespace("lubridate"))
     wp <- win_processes(verbose=TRUE)
     users <- win_users()
     names(users) <- c("Username", "Session.Name", "Session.ID", "State", "Idle.Time", "Logon.Time")
     joined <- merge( wp[setdiff(names(wp), "User.Name")]
                    , users, by="Session.Name")
     
-    plyr::arrange(
-	plyr::ddply( joined, plyr::as.quoted("Username"), plyr::summarize
-                   , Mem.Usage = sum(Mem.Usage)
-                   , N.Processes = NROW(Mem.Usage)
-                   , CPU.Time = sum(CPU.Time)
-                   ), Mem.Usage, CPU.Time)
+    dplyr::arrange_(
+        dplyr::summarize_( dplyr::group_by_(joined, "Username")
+                         , Mem.Usage   = ~sum(Mem.Usage)
+                         , N.Processes = ~length(unique(PID))
+                         , CPU.Time    = ~sum(CPU.Time)
+                         )
+                    , 'Mem.Usage', 'CPU.Time'
+                    )
 }

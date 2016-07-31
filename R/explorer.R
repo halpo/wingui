@@ -10,9 +10,9 @@ find_default_fm <-
 function(sysname = Sys.info()['sysname']){
     #TODO: add full.path options to give option of returning full path.
     switch( OS.type
-          , Windows = "explorer.exe"
-          , Darwin  = "open"
-          , Linux   = "xdg-open"
+          , 'Windows' = "explorer.exe"
+          , 'Darwin'  = "open"
+          , 'Linux'   = "xdg-open"
           )
 }
 if(FALSE){#! @test

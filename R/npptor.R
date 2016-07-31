@@ -1,3 +1,11 @@
+{###############################################################################
+#  npptor.R
+#  2013 Andrew Redd
+#  
+#  This file is released under the terms of the MIT license.
+#  Please See http://www.r-project.org/Licenses/MIT
+}###############################################################################
+
 find_npp <- 
 function(){
     exe <- 

@@ -1,3 +1,10 @@
+{###############################################################################
+#  spawn.R
+#  2013 Andrew Redd
+#  
+#  This file is released under the terms of the MIT license.
+#  Please See http://www.r-project.org/Licenses/MIT
+}###############################################################################
 
 #' Spawn an additional R gui
 #' 
@@ -41,7 +48,7 @@ function( wd      = getwd() #< [character] Working directory
 #' @return Called for the side effect of creating a separate process.
 #' @export
 BATCH <- function(file){
-	system2( list.file(R.home("bin"), "Rcmd", full.names=TRUE)
+	system2( list.files(R.home("bin"), "Rcmd", full.names=TRUE)
 	       , sprintf("BATCH %s", shQuote(file))
 		   , wait=FALSE, invisible=TRUE)
 }

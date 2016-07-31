@@ -1,3 +1,10 @@
+{###############################################################################
+#  win_read_lnk.R
+#  2013 Andrew Redd
+#  
+#  This file is released under the terms of the MIT license.
+#  Please See http://www.r-project.org/Licenses/MIT
+}###############################################################################
 
 raw2int <- function(x){
   round(sum(as.integer(x) * 2L^(8*(seq(0, length(x)-1)))))

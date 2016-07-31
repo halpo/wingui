@@ -11,12 +11,34 @@
 #' @name wingui
 #' @docType package
 #' @title Manipulate the Windows Rgui.
+#' @description
+#' Interact with windows gui and other processes on windows.
+#' 
+#' \enumerate{
+#'   \item \code{\link{GUI}}
+#'   \item \code{\link{win_memory}}
+#'   \item \code{\link{win_load}}
+#'   \item \code{\link{whos_the_hog}}
+#'   \item \code{\link{win_load}}
+#'   \item \code{\link{win_kill}}
+#'   \item \code{\link{win_users}}
+#'   \item \code{\link{win_process_running}}
+#'   \item \code{\link{win_processes}}
+#'   \item \code{\link{spawnR}}
+#'   \item \code{\link{BATCH}}
+#'   \item \code{\link{explorer}}
+#'   \item \code{\link{is_r_startup}}
+#'   \item \code{\link{npptor}}
+#'   \item \code{\link{npp}}
+#' }
 #' 
 #' @importFrom utils head tail read.csv
 #' @import Rcpp
 #' @import methods
 #' @useDynLib wingui
 NULL
+
+.hwnd <- NULL #< Global variable check confuser
 
 if(!exists(".packageName", inherit=F))
     .packageName <- 'wingui'

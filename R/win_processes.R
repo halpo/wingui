@@ -11,8 +11,8 @@
 #' @param verbose Verbose output.
 #'
 #' @return a data.frame with process information
-#' @export
 #' @importFrom lubridate dhours dminutes dseconds
+#' @export
 win_processes <-
 function( verbose = TRUE  #< Verbose output.
         ){
@@ -40,11 +40,10 @@ function( verbose = TRUE  #< Verbose output.
 #' @return A logical indicating if there exists a process running.
 #' @export
 win_process_running <-
-function( name	    	#< Program name, Process ID, or Session Name.
-	    , server=NULL  	#< server to check on, if `NULL` defaults to local host.
-	    , session=NULL  #< session to filter for.
+function( name
+	    , server=NULL
+	    , session=NULL
 	    ){
-    #' Check for a running process.
     output <-
 	system2( "QUERY"
 	       , c("PROCESS", name)

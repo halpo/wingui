@@ -1,33 +1,44 @@
+{###############################################################################
+#  win_memory.R
+#  2013 Andrew Redd
+#  
+#  This file is released under the terms of the MIT license.
+#  Please See http://www.r-project.org/Licenses/MIT
+}###############################################################################
+
 #' Get the memory usage for the current machine.
+#' 
+#' @param print Should a summary be printed out?
 #' 
 #' Uses the API call GlobalMemoryStatusEx to retrieve information
 #' about the memory usage on the machine.
 #'
 #' @seealso `<win_processes>`
 #' @export
+#' @importFrom utils txtProgressBar
 win_memory <- 
-function(print=TRUE  #< Should a summary be printed out.
+function(print=TRUE  #< Should a summary be printed out?
         ){
     if(!is.loaded("GlobalMemoryStatusEx"))
         dyn.load( Sys.which("Kernel32.dll"))
     r <- raw(64)
     r[[1]] <- as.raw(64L)
     s <- .C("GlobalMemoryStatusEx", r)[[1]]
-    mem <-  list( Size                  = wingui:::raw2int(s[1:4 + 4L*0])
-                , Percent               = wingui:::raw2int(s[1:4 + 4L*1])
-                , Physical              = wingui:::raw2int(s[1:8 + 8L*1L])
-                , Available             = wingui:::raw2int(s[1:8 + 8L*2L])
-                , TotalPage             = wingui:::raw2int(s[1:8 + 8L*3L])
-                , AvailPage             = wingui:::raw2int(s[1:8 + 8L*4L])
-                , TotalVirtual          = wingui:::raw2int(s[1:8 + 8L*5L])
-                , AvailVirtual          = wingui:::raw2int(s[1:8 + 8L*6L])
-                , AvailVirtualExtended  = wingui:::raw2int(s[1:8 + 8L*7L])
+    mem <-  list( Size                  = raw2int(s[1:4 + 4L*0])
+                , Percent               = raw2int(s[1:4 + 4L*1])
+                , Physical              = raw2int(s[1:8 + 8L*1L])
+                , Available             = raw2int(s[1:8 + 8L*2L])
+                , TotalPage             = raw2int(s[1:8 + 8L*3L])
+                , AvailPage             = raw2int(s[1:8 + 8L*4L])
+                , TotalVirtual          = raw2int(s[1:8 + 8L*5L])
+                , AvailVirtual          = raw2int(s[1:8 + 8L*6L])
+                , AvailVirtualExtended  = raw2int(s[1:8 + 8L*7L])
                 ) 
     if(print){
-        sprintf("%.0f/%.0f", mem$Available, mem$Physical) %>% cat("\n")
-        txtProgressBar(0, 100, mem$Percent, style=3
-            , width = min(59, floor(getOption("width")*.8))) %>% 
-            close
+        cat(sprintf("%.0f/%.0f", mem$Available, mem$Physical), "\n")
+        close(utils::txtProgressBar(0, 100, mem$Percent, style=3
+            , width = min(59, floor(getOption("width")*.8))))
+            
     }
     #! ```@references
     #!  - bibtype: Manual
@@ -55,8 +66,6 @@ win_load <- function(){
 
 #' Lists the resource useage summarized by user.
 #' 
-#' @Suggests plyr
-#' @Suggests lubridate
 #' @export
 whos_the_hog <- function(){
     "Lists the resource useage summarized by user."

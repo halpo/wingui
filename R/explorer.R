@@ -1,13 +1,24 @@
+{###############################################################################
+#  explorer.R
+#  2013 Andrew Redd
+#  
+#  This file is released under the terms of the MIT license.
+#  Please See http://www.r-project.org/Licenses/MIT
+}###############################################################################
 
 find_default_fm <- 
-function(){
-    switch( .Platform$OS.type
-          , windows = "explorer.exe"
-          , unix    = switch( Sys.info()['sysname']
-                            , Darwin = "open"
-                            , "xdg-open"
-                            )
+function(sysname = Sys.info()['sysname']){
+    #TODO: add full.path options to give option of returning full path.
+    switch( OS.type
+          , Windows = "explorer.exe"
+          , Darwin  = "open"
+          , Linux   = "xdg-open"
           )
+}
+if(FALSE){#! @test
+    expect_equal(find_default_fm("Windows", "explorer.exe"))
+    expect_equal(find_default_fm("Darwin" , "open"))
+    expect_equal(find_default_fm("Linux", "xdg-open"))
 }
 
 #' Open the file manager

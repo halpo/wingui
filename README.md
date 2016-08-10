@@ -1,5 +1,6 @@
 # wingui
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/wingui)](https://cran.r-project.org/package=wingui)
+[![Coverage Status](https://img.shields.io/codecov/c/github//master.svg)](https://codecov.io/github/?branch=master)
 
 The goal of wingui is to augment the interaction with the built-in 
 R gui for Windows.  It also includes helpful utilities specific to 

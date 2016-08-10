@@ -6,3 +6,5 @@ wingui.npp
 ^CONDUCT\.md$
 R/\.Rprofile
 \.Rprofile
+^\.travis\.yml$
+^codecov\.yml$

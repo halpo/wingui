@@ -1,3 +1,4 @@
 *.dll
 src-*
 man
+/*.nppsession

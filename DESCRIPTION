@@ -15,10 +15,13 @@ Depends:
     lubridate,
     Rcpp
 Imports:
-    utils
+    utils, 
+    dplyr
 Suggests:
     plyr,
-    stringr
+    stringr,
+    testthat,
+    covr
 LinkingTo: Rcpp
 Roxygen: list(wrap = FALSE)
 RoxygenNote: 5.0.1

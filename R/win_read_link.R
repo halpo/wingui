@@ -9,6 +9,18 @@
 raw2int <- function(x){
   round(sum(as.integer(x) * 2L^(8*(seq(0, length(x)-1)))))
 }
+if(FALSE){#! @testing
+    x <- 1234567890
+    y <- "499602D2"
+    
+    r <- raw(4)
+    r[[4]] <- as.raw(0x49)
+    r[[3]] <- as.raw(0x96)
+    r[[2]] <- as.raw(0x02)
+    r[[1]] <- as.raw(0xD2)
+    
+    expect_equal(raw2int(r), 1234567890)
+}
 raw2CLSID <- function(r){
     stopifnot(length(r) == 16 && is.raw(r))
     paste( sep="-"
@@ -17,18 +29,44 @@ raw2CLSID <- function(r){
          , paste0(   (r[7:8]), collapse='')
          , paste0(   (r[9:10]), collapse='')
          , paste0(   (r[11:16]), collapse='')
-         )    
+         )
 }
-raw2unicode <- function(r){
-    fout <- pipe(Sys.which("cmd"), "wb")
-    fin  <- pipe(Sys.which("cmd"), "r", encoding="UTF-8")
-    scan(fin, character(), -1)
-    writeBin(r, fout)
-    flush(fout)
-    x <- scan(fin, character(), 56)
-    close(fout)
-    close(fin)
-    return(x)
+if(FALSE){#! @test
+    r <- raw(16)
+    r[[16]] <- as.raw(0xFF)
+    r[[15]] <- as.raw(0xEE)
+    r[[14]] <- as.raw(0xDD)
+    r[[13]] <- as.raw(0xCC)
+    r[[12]] <- as.raw(0xBB)
+    r[[11]] <- as.raw(0xAA)
+    r[[10]] <- as.raw(0x99)
+    r[[09]] <- as.raw(0x88)
+    r[[08]] <- as.raw(0x77)
+    r[[07]] <- as.raw(0x66)
+    r[[06]] <- as.raw(0x55)
+    r[[05]] <- as.raw(0x44)
+    r[[04]] <- as.raw(0x33)
+    r[[03]] <- as.raw(0x22)
+    r[[02]] <- as.raw(0x11)
+    r[[01]] <- as.raw(0x00)
+    expect_equal(raw2CLSID(r), "33221100-4455-6677-8899-aabbccddeeff")
+}
+raw2utf8 <- function(r){
+    tmp <- tempfile()
+    on.exit(unlink(tmp))
+
+    con.w <- file(tmp, 'wb', encoding='UTF-8')
+    writeBin(r, con.w)
+    # writeBin(as.raw(0x00), con.w)
+    close(con.w)
+
+    readLines(tmp, encoding="UTF-8", warn=FALSE)
+}
+if(F){#! @test
+    s <- enc2utf8("\u3008hello world!\u3009")
+    r <- iconv(s, 'UTF-8', 'UTF-8', toRaw=TRUE)[[1]]
+    e <- raw2utf8(r)
+    expect_equal(s, e)
 }
 
 blockReader <- 
@@ -166,46 +204,70 @@ readTargetIDList <- function(f, ...){#read target IDList
 }
 parseLinkInfo <- function(li, ...){
     size <- raw2int(li$get_exact(1:4))
-    header.size <- li$get_int()
+    link.info.header.size <- li$get_int()
     flags <- 
         structure( as.logical(rawToBits(li$get())[1:2])
                  , names=c("VolumeIDAndLocalBasePath", "CommonNetworkRelativeLinkAndPathSuffix"))
+    
     volume.id.offset                    <- li$get_int()
     local.base.path.offset              <- li$get_int()
     common.network.relative.link.offset <- li$get_int()
     common.path.suffix.offset           <- li$get_int()
     
-    if(header.size >= 0x24){
-        local.base.path.offset.unicode <- li$get_int()    
-        common.path.suffix.offset.unicode <- li$get_int()
-    } 
     
     if(flags['VolumeIDAndLocalBasePath']){
-        stop("Not implimented")
+        if(link.info.header.size >= 0x24)
+            local.base.path.offset.unicode <- li$get_int()
         vi <- li$sub()
-        volumne.id <- 
-            list( drive.type                  = vi$get_int()
-                , drive.serial.number         = vi$get_int()
-                , volume.label.offset         = vi$get_int()
-                , volume.label.offset.unicode = vi$get_int()
-                )
-        #TODO FInish the volume info extraction
-        #TODO  Local Base path extraction
+        volume.id <- parseVolumeID(vi)
+        
+        if(li$offset != local.base.path.offset)
+            li$offset <- local.base.path.offset
+        link <- 
+        local.base.path <- li$get_string()
     } else {
         stopifnot( volume.id.offset       == 0 
                  , local.base.path.offset == 0 )
     }
+    if(link.info.header.size >= 0x24){
+        common.path.suffix.offset.unicode <- li$get_int()
+    } 
     if(flags['CommonNetworkRelativeLinkAndPathSuffix']){
         common.network.relative.link <- 
             parseCommonNetworkRelativeLink(cn <- li$sub())
         common.path.suffix <- li$get_string()
+        link <- file.path( common.network.relative.link$device.name
+                         , common.path.suffix
+                         )
     }else{
         stopifnot( common.network.relative.link.offset == 0 )
     }
     
     #TODO unicode strings
-    structure(as.list(environment()), raw=li)
+    structure( link
+             , env = as.list(environment()), raw=li)
 }
+parseVolumeID <- function(vi){
+    volume.info.size <- raw2int(vi$get_exact(1:4))
+    
+    drive.type                  = vi$get_int()
+    drive.serial.number         = vi$get_int()
+    volume.label.offset         = vi$get_int()
+    if(volume.label.offset == 0x14){
+        volume.label.offset.unicode = vi$get_int()
+        stop("notimplimented")
+    } else {
+        if(vi$offset != volume.label.offset) vi$offset <- volume.label.offset
+        data <- vi$get_string()
+    }
+    list( drive.type          = drive.type         
+        , drive.serial.number = drive.serial.number
+        , volume.label.offset = volume.label.offset
+        , data = data
+        )
+}
+
+
 parseCommonNetworkRelativeLink <- function(cn){
     flags <- structure( as.logical(rawToBits(cn$get()))[1:2]
                       , names = c("ValidDevice", "ValidNetType"))
@@ -247,10 +309,8 @@ read_lnk <- function(filename, ...){
         stopifnot(terminalid==0)
     }
     if(header$flags["HasLinkInfo"]){
+        link <- 
         link.info <- parseLinkInfo(li <- reader$sub(4))
-        link <- file.path( link.info$common.network.relative.link$device.name
-                         , link.info$common.path.suffix
-                         )
     }
     if(reader$left() && header$flags["HasRelativePath"]){
         link <- 
@@ -274,6 +334,12 @@ read_lnk <- function(filename, ...){
                  , class = c("WindowsLinkInfo", "character")
                  ))
 }
+if(FALSE){#' @test
+    file <- system.file("test.lnk", package="wingui")
+    expect_equal( as.character(read_lnk(file)), '.')
+}
+
+
 parsePropertyStore <- function(ps, sig = ps$get_int()){
     stopifnot(sig == 0xA0000009)
     return(list(sig=sig, "not implimented"))

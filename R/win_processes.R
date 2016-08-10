@@ -54,7 +54,7 @@ function( name
     on.exit(close(file))
     info <- utils::read.csv( file, na.strings="N/A")
     return(structure(TRUE, info=info))
-    #' A logical indicating if there exists a process running.
+    #< A logical indicating if there exists a process running.
 }
 
 #' List logged on users

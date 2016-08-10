@@ -49,9 +49,11 @@ function(print=TRUE  #< Should a summary be printed out?
     return(invisible(mem))
     #< invisibly returns a `data.frame` the memory usage on the machine.
 }
-#` @export
+
+
+#' Get the percentage of load on the machine 
+#' @export
 win_load <- function(){
-    #! Get the percentage of load on the machine 
     output <- 
         system2("wmic", list("CPU", "GET", "LoadPercentage", "/format:csv"), stdout=TRUE)
     #! ```@references

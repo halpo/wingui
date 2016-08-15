@@ -21,24 +21,25 @@ if(FALSE){#! @test
     expect_equal(find_default_fm("Linux", "xdg-open"))
 }
 
+# nocov start
 #' Open the file manager
 #' 
 #' @param dir Directory to open.
 #' @param manager the file manager to use.
 #' 
+#' @return called for the side effect.
 #' @export
 file_manager <- 
 function( dir     = getwd()                                         #< Directory to open
         , manager = getOption("file.manager", find_default_fm())    #< The file manager to use.
         ){
-    "Open the file manager."
     dir <- normalizePath(dir)
     if(.Platform$OS.type=="windows")
         suppressWarnings(system2(manager, shQuote(dir), wait=FALSE, invisible=FALSE))
     else 
         suppressWarnings(system2(manager, shQuote(dir), wait=FALSE))
-    #! @return called for the side effect.
 }
+# nocov end
 
 #' @export
 #' @describeIn file_manager alias for \code{file_manager}

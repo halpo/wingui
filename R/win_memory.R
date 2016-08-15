@@ -66,6 +66,7 @@ win_load <- function(){
     #< An integer (0-100) representing the percent load on the machine.
 }
 
+# nocov start
 #' Lists the resource useage summarized by user.
 #' 
 #' @importFrom dplyr arrange_ summarize group_by_
@@ -88,3 +89,4 @@ whos_the_hog <- function(){
                     , 'Mem.Usage', 'CPU.Time'
                     )
 }
+# nocov end

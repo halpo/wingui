@@ -43,12 +43,13 @@ NULL
 if(!exists(".packageName", inherit=F))
     .packageName <- 'wingui'
 
+# nocov start
 if(.Platform$OS.type=="windows"){
     setRcppClass( "WindowsGUI"
                 , module='wingui'
 #~                 , saveAs="WindowsGUI"
                 , methods=list(show=function(){
-                        cat("Windows GUI (", .hwnd, ")\n")  
+                        cat("Windows GUI (", .hwnd, ")\n")
                     })
                 )
     myLoad <- function(ns){
@@ -60,7 +61,7 @@ if(.Platform$OS.type=="windows"){
     }
     setLoadAction(myLoad)
 }
-
+# nocov end
 
 
 #' @title Windows Rgui accessor class

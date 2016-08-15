@@ -5,7 +5,7 @@
 #  This file is released under the terms of the MIT license.
 #  Please See http://www.r-project.org/Licenses/MIT
 }###############################################################################
-
+# nocov start
 find_npp <- 
 function(){
     exe <- 
@@ -86,3 +86,4 @@ function( file  = NULL
     if(!is.null(exe))
         system2(exe, args, wait=F, invisible=F)
 }
+# nocov end

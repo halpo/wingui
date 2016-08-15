@@ -104,6 +104,7 @@ win_load <- function(){
     #^ and Max Clock Speed (Mhz)
 }
 
+# nocov start
 #' Kill Processes
 #'
 #' @param ...    Thrown Away, used to force user to specify full argument name.
@@ -130,4 +131,5 @@ function( ...
     if(!missing(title))
         system2("taskkill", c(if(force)"/F", "/FI", shQuote(paste0("Windowtitle eq ", title))))
 }
+# nocov end
 

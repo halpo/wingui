@@ -6,6 +6,7 @@
 #  Please See http://www.r-project.org/Licenses/MIT
 }###############################################################################
 
+# nocov start
 #' Spawn an additional R gui
 #' 
 #' @param wd Working directory
@@ -39,6 +40,7 @@ function( wd      = getwd() #< [character] Working directory
 	system2(file.path(R.home("bin"), "Rgui.exe"), args
 	       , wait=FALSE, stdout=FALSE, stderr=FALSE, invisible=FALSE)
 }
+# nocov end
 
 
 #' Run a file in a separate Batch mode.

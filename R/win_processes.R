@@ -23,10 +23,12 @@ function( verbose = TRUE  #< Verbose output.
     wp <- utils::read.csv( file, na.strings="N/A")
     names(wp) <- gsub("\\.$", "", names(wp))
     wp$Mem.Usage = as.numeric(gsub(" K", "", gsub(",", "", wp$Mem.Usage)))
-    wp$CPU.Time  =(lubridate::dhours  (as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\1", wp$CPU.Time)))
-                 + lubridate::dminutes(as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\2", wp$CPU.Time)))
-                 + lubridate::dseconds(as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\3", wp$CPU.Time)))
-                 )
+    if('CPU.Time' %in% names(wp)) {
+        wp$CPU.Time  =(lubridate::dhours  (as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\1", wp$CPU.Time)))
+                     + lubridate::dminutes(as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\2", wp$CPU.Time)))
+                     + lubridate::dseconds(as.integer(gsub("(\\d+):(\\d+):(\\d+)", "\\3", wp$CPU.Time)))
+                     )
+    }
     wp$Session.Name = tolower(wp$Session.Name)
     wp
 }
@@ -45,10 +47,11 @@ function( name
 	    , session=NULL
 	    ){
     output <-
+    suppressWarnings(
 	system2( "QUERY"
 	       , c("PROCESS", name)
-	       , stdout=TRUE)
-    if(any(grepl("No Process exits", output))) return(FALSE)
+	       , stdout=TRUE))
+    if(any(grepl("No Process exists", output, fixed=TRUE))) return(FALSE)
     output <- gsub("^[ >]", '', output)
     file <- textConnection(output)
     on.exit(close(file))
@@ -76,20 +79,10 @@ function(){
     return(z)
 }
 if(FALSE){ #testing
-    library(plyr)
-    processes <- win_processes()
-    head(processes)
-
-    arrange(processes, ImageName)
-    "NppToR.exe" %in% win_processes()$ImageName
-
-    using(plyr)
-    ddply( win_processes(), .(Session), summarize
-         , Total.Mem = sum(Mem.Usage)
-         )
+    users <- win_users()
+    expect_is(users, 'data.frame')
+    expect_equal(names(users), c('USERNAME', 'SESSIONNAME', 'ID', 'STATE', 'IDLE TIME', 'LOGON TIME'))
 }
-
-LoadPercentage <- NULL #< variable check confuser.
 
 #' list the load on the CPU.
 #' @export
@@ -102,6 +95,11 @@ win_load <- function(){
     #! @Return A <data.frame> with Node, Processor Name,
     #^ Current load percent (0-1), Current clock speed (Mhz),
     #^ and Max Clock Speed (Mhz)
+}
+if(FALSE){#! @testing
+    load <- win_load()
+    expect_is(load, 'data.frame')
+    expect_equal( names(load), c("Node", "Name", "LoadPercentage", "CurrentClockSpeed", "MaxClockSpeed"))
 }
 
 # nocov start

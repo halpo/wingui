@@ -23,7 +23,7 @@ function(print=TRUE  #< Should a summary be printed out?
         dyn.load( Sys.which("Kernel32.dll"))
     r <- raw(64)
     r[[1]] <- as.raw(64L)
-    s <- .C("GlobalMemoryStatusEx", r)[[1]]
+    s <- .C("GlobalMemoryStatusEx", r, PACKAGE="Kernel32")[[1]]
     mem <-  list( Size                  = raw2int(s[1:4 + 4L*0])
                 , Percent               = raw2int(s[1:4 + 4L*1])
                 , Physical              = raw2int(s[1:8 + 8L*1L])
@@ -38,7 +38,6 @@ function(print=TRUE  #< Should a summary be printed out?
         cat(sprintf("%.0f/%.0f", mem$Available, mem$Physical), "\n")
         close(utils::txtProgressBar(0, 100, mem$Percent, style=3
             , width = min(59, floor(getOption("width")*.8))))
-            
     }
     #! ```@references
     #!  - bibtype: Manual
@@ -49,7 +48,15 @@ function(print=TRUE  #< Should a summary be printed out?
     return(invisible(mem))
     #< invisibly returns a `data.frame` the memory usage on the machine.
 }
-
+if(FALSE){#! @test
+    expect_output(x <- win_memory())
+    expect_is(x, 'list')
+    expect_equal(names(x), 
+        c( 'Size', 'Percent', 'Physical', 'Available'
+         , 'TotalPage', 'AvailPage', 'TotalVirtual'
+         , 'AvailVirtual', 'AvailVirtualExtended'
+         ))
+}
 
 #' Get the percentage of load on the machine 
 #' @export

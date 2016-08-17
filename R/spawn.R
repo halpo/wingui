@@ -43,6 +43,7 @@ function( wd      = getwd() #< [character] Working directory
 # nocov end
 
 
+# nocov start
 #' Run a file in a separate Batch mode.
 #'
 #' @param file the file to run.
@@ -61,3 +62,4 @@ in_dir <- function(dir, code){
     setwd(dir)
     force(code)
 }
+# nocov end

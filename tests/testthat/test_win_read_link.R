@@ -36,19 +36,11 @@ test_that("raw2CLSID", {
     expect_equal(raw2CLSID(r), "33221100-4455-6677-8899-aabbccddeeff")
 })
 
-test_that("raw2utf8", {
-    s <- enc2utf8("\u3008hello world!\u3009")
-    r <- iconv(s, 'UTF-8', 'UTF-8', toRaw=TRUE)[[1]]
-    e <- raw2utf8(r)
-    expect_equal(s, e)
-})
-
 test_that("read_lnk", {
     file <- system.file("test.lnk", package="wingui")
     expect_equal( as.character(read_lnk(file)), '.')
     
     info <- read_lnk(system.file("net.lnk", package="wingui"))
-    
     expect_equal(as.character(info), file.path("G:", "\u4f60\u597d"))
     expect_true(env[['flags']][['CommonNetworkRelativeLinkAndPathSuffix']])
 })

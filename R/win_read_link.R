@@ -51,27 +51,6 @@ if(FALSE){#! @test
     r[[01]] <- as.raw(0x00)
     expect_equal(raw2CLSID(r), "33221100-4455-6677-8899-aabbccddeeff")
 }
-raw2utf8 <- function(r){
-    tmp <- tempfile()
-    on.exit(unlink(tmp))
-
-    con.w <- file(tmp, 'wb', encoding='UTF-8')
-    writeBin(r, con.w)
-    # writeBin(as.raw(0x00), con.w)
-    close(con.w)
-
-    readLines(tmp, encoding="UTF-8", warn=FALSE)
-}
-raw2utf16 <- function(r){
-    if(is.raw(r)) r <- list(r)
-    iconv(r, from="UTF-16BE", to="UTF-8")
-}
-if(F){#! @test
-    s <- enc2utf8("\u3008hello world!\u3009")
-    r <- iconv(s, 'UTF-8', 'UTF-8', toRaw=TRUE)[[1]]
-    e <- raw2utf8(r)
-    expect_equal(s, e)
-}
 
 blockReader <- 
 function( block

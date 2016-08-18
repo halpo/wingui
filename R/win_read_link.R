@@ -112,14 +112,6 @@ function( block
     back <- function(size = 4){offset <<- offset - size}
     return(structure(environment(), class=c("blockReader", "environment"), start=start))
 }
-readBlock <- function(filename, size.block.size = 4, ...){
-    raw.size <- readBin(filename, "raw", size.block.size)
-    size <- raw2int(raw.size)
-    block <- readBin(file, "raw", size - size.block.size)
-    block <- c(raw.size, block)
-    offset <- size
-    structure(block, start=offset)
-}
 
 parseLnkHeader <- 
 function( header #< blockReader for the header.
@@ -188,10 +180,6 @@ parseTargetIDList <- function(idlist){
         while(idlist$more() && !raw2int(idlist$peek(1))) idlist$get(1)
     }
     return(items)
-}
-readTargetIDList <- function(f, ...){#read target IDList
-    idlist <- readBlock(f, 2)
-    parseTargetIDList(idlist)
 }
 parseLinkInfo <- function(li, ...){
     {# Header extraction

@@ -62,6 +62,10 @@ raw2utf8 <- function(r){
 
     readLines(tmp, encoding="UTF-8", warn=FALSE)
 }
+raw2utf16 <- function(r){
+    if(is.raw(r)) r <- list(r)
+    iconv(r, from="UTF-16BE", to="UTF-8")
+}
 if(F){#! @test
     s <- enc2utf8("\u3008hello world!\u3009")
     r <- iconv(s, 'UTF-8', 'UTF-8', toRaw=TRUE)[[1]]
@@ -71,8 +75,7 @@ if(F){#! @test
 
 blockReader <- 
 function( block
-        , start=attr(block, "start")
-        , filename=attr(block, "filename")
+        , start       = attr(block, "start")
     ){
     size <- length(block)
     if(is.null(start))
@@ -89,29 +92,38 @@ function( block
     get_clsid <- function(){raw2CLSID(get(16))}
     get_string <- function(unicode=FALSE, size.prefixed=FALSE){
         if(unicode){
-            if(is.null(filename)) stop("need filename to read unicode strings.")
-            f <- file(filename, "rb")
-            on.exit(close(f), add=TRUE)
-            n <- if(size.prefixed) get_int(2) else {
-                r <- remaining()
-                s <- r==0
-                min(which(head(s, -1) & tail(s, -1))) + 1
+            r <- remaining()
+            if(size.prefixed){
+                m <- get_int(2)
+            } else {
+                w <- which(colSums(matrix(r==0, nrow=2))==2)
+                if(length(w)){
+                    m <-(min(w)-1)*2 
+                    on.exit(offset <<- offset + m + 2)
+                }else{
+                    m <- length(r)
+                    on.exit(offset <<- offset + m)
+                }
             }
-            readBin(f, "raw", offset)
-            s <- readBin(f, character(), n, 2L)
-            offset <<- offset + 2*n
-            paste(s, collapse="")
+            iconv(list(r[1:m]), from = 'UTF-16LE', to = 'UTF-8')
         }else{
             n <- if(size.prefixed) get_int(1) else min(which(remaining()==0))
             rawToChar(get(n))
         }
     }
     reset <- function(x=start){offset <<- x}
-    sub <- function(size.block.size = 4){
-        size  <- raw2int(peek(size.block.size))
-        block <- get(size)
-        blockReader(block, size.block.size)
+    sub <- function( size.block.size = 4
+                   , size            = raw2int(peek(size.block.size))
+                   , adjust.start    = 0
+                   ){
+        on.exit(offset <<- offset + size + adjust.start)
+        sub_exact(offset + adjust.start, size=size, start = size.block.size - adjust.start)
     }
+    sub_exact <- function(offset, size, ...){
+        block = get_exact(seq.int(size)+offset)
+        blockReader(block, ...)
+    }
+    
     consume <- function(){
         w <- which(block == 0)
         while(peek(1)==0) get(1)
@@ -203,21 +215,35 @@ readTargetIDList <- function(f, ...){#read target IDList
     parseTargetIDList(idlist)
 }
 parseLinkInfo <- function(li, ...){
-    size <- raw2int(li$get_exact(1:4))
-    link.info.header.size <- li$get_int()
-    flags <- 
-        structure( as.logical(rawToBits(li$get())[1:2])
-                 , names=c("VolumeIDAndLocalBasePath", "CommonNetworkRelativeLinkAndPathSuffix"))
-    
-    volume.id.offset                    <- li$get_int()
-    local.base.path.offset              <- li$get_int()
-    common.network.relative.link.offset <- li$get_int()
-    common.path.suffix.offset           <- li$get_int()
-    
-    
+    {# Header extraction
+        header <- li$sub(adjust.start = -4)
+        flags  <- structure( as.logical(rawToBits(header$get(4))[1:2])
+                           , names=c("VolumeIDAndLocalBasePath", "CommonNetworkRelativeLinkAndPathSuffix"))
+        volume.id.offset                    <- header$get_int()
+        local.base.path.offset              <- header$get_int()
+        if(!flags[1]){
+            stopifnot( volume.id.offset       == 0
+                     , local.base.path.offset == 0
+                     )
+        }
+        common.network.relative.link.offset <- header$get_int()
+        common.path.suffix.offset           <- header$get_int()
+        if(!flags[2]){
+            stopifnot( common.network.relative.link.offset == 0
+                     , common.path.suffix.offset           == 0
+                     )
+        }
+        if(header$size >= 0x24){
+            local.base.path.offset.unicode    <- header$get_int()
+            common.path.suffix.offset.unicode <- header$get_int()
+            if(!flags[1]) stopifnot(local.base.path.offset.unicode    ==0)
+            if(!flags[2]) stopifnot(common.path.suffix.offset.unicode ==0)
+        } else {
+            local.base.path.offset.unicode    <- NA
+            common.path.suffix.offset.unicode <- NA
+        }
+    }
     if(flags['VolumeIDAndLocalBasePath']){
-        if(link.info.header.size >= 0x24)
-            local.base.path.offset.unicode <- li$get_int()
         vi <- li$sub()
         volume.id <- parseVolumeID(vi)
         
@@ -225,22 +251,23 @@ parseLinkInfo <- function(li, ...){
             li$offset <- local.base.path.offset
         link <- 
         local.base.path <- li$get_string()
-    } else {
-        stopifnot( volume.id.offset       == 0 
-                 , local.base.path.offset == 0 )
+        
     }
-    if(link.info.header.size >= 0x24){
-        common.path.suffix.offset.unicode <- li$get_int()
-    } 
     if(flags['CommonNetworkRelativeLinkAndPathSuffix']){
+        if(li$offset != common.network.relative.link.offset) li$reset(li$offset != common.network.relative.link.offset)
         common.network.relative.link <- 
             parseCommonNetworkRelativeLink(cn <- li$sub())
-        common.path.suffix <- li$get_string()
+        if(common.path.suffix.offset > 0)
+            common.path.suffix <- li$get_string()
+        
+        if(!is.na(common.path.suffix.offset.unicode)){
+            li$reset(common.path.suffix.offset.unicode)
+            common.path.suffix <- li$get_string(unicode=TRUE)
+        }
+        
         link <- file.path( common.network.relative.link$device.name
                          , common.path.suffix
                          )
-    }else{
-        stopifnot( common.network.relative.link.offset == 0 )
     }
     
     #TODO unicode strings
@@ -266,8 +293,6 @@ parseVolumeID <- function(vi){
         , data = data
         )
 }
-
-
 parseCommonNetworkRelativeLink <- function(cn){
     flags <- structure( as.logical(rawToBits(cn$get()))[1:2]
                       , names = c("ValidDevice", "ValidNetType"))
@@ -278,7 +303,7 @@ parseCommonNetworkRelativeLink <- function(cn){
         net.name.offset.unicode    <- cn$get_int()
         device.name.offset.unicode <- cn$get_int()
     }
-    net.name     <- cn$get_string()
+    net.name    <- cn$get_string()
     device.name <- cn$get_string()
     
     structure(as.list(environment()))
@@ -299,8 +324,8 @@ read_lnk <- function(filename, ...){
     total.size <- file.info(filename)$size
     all.bytes <- 
     bytes <- readBin(filename, "raw", total.size)
-    reader <- blockReader(bytes, 0, filename=filename)
-    header <- parseLnkHeader(reader$sub(4))
+    reader <- blockReader(bytes, 0)
+    header <- parseLnkHeader(reader$sub())
     
     if(header$flags["HasLinkTargetIDList"]){
         idlist <- reader$sub(2)
@@ -337,6 +362,11 @@ read_lnk <- function(filename, ...){
 if(FALSE){#' @test
     file <- system.file("test.lnk", package="wingui")
     expect_equal( as.character(read_lnk(file)), '.')
+    
+    info <- read_lnk(system.file("net.lnk", package="wingui"))
+    
+    expect_equal(as.character(info), file.path("G:", "\u4f60\u597d"))
+    expect_true(env[['flags']][['CommonNetworkRelativeLinkAndPathSuffix']])
 }
 
 

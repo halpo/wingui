@@ -46,5 +46,10 @@ test_that("raw2utf8", {
 test_that("read_lnk", {
     file <- system.file("test.lnk", package="wingui")
     expect_equal( as.character(read_lnk(file)), '.')
+    
+    info <- read_lnk(system.file("net.lnk", package="wingui"))
+    
+    expect_equal(as.character(info), file.path("G:", "\u4f60\u597d"))
+    expect_true(env[['flags']][['CommonNetworkRelativeLinkAndPathSuffix']])
 })
 
